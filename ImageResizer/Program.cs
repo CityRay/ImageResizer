@@ -18,16 +18,28 @@ namespace ImageResizer
 
             imageProcess.Clean(destinationPath);
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            Stopwatch sw1 = new Stopwatch();
+            sw1.Start();
+            imageProcess.ResizeImages(sourcePath, destinationPath, 2.0);
+            sw1.Stop();
+
+            Stopwatch sw2 = new Stopwatch();
+            sw2.Start();
+            imageProcess.ResizeImagesWait(sourcePath, destinationPath, 2.0);
+            sw2.Stop();
+
+            Stopwatch sw3 = new Stopwatch();
+            sw3.Start();
             await imageProcess.ResizeImagesAsync(sourcePath, destinationPath, 2.0);
-            sw.Stop();
+            sw3.Stop();
 
-            Console.WriteLine($"花費時間: {sw.ElapsedMilliseconds} ms");
+            Console.WriteLine($"花費時間          : {sw1.ElapsedMilliseconds} ms");
 
-            // 原始花費時間           : 3354 ms
-            // WaitAll              : 2642 ms
-            // async await whenall  : 2311 ms
+            double percent1 = Math.Round((sw1.ElapsedMilliseconds - sw2.ElapsedMilliseconds) * 1.00 / sw1.ElapsedMilliseconds * 100.0, 1);
+            Console.WriteLine($"花費時間 WaitAll  : {sw2.ElapsedMilliseconds} ms, 提升: {percent1} %");
+
+            double percent2 = Math.Round((sw1.ElapsedMilliseconds - sw3.ElapsedMilliseconds) * 1.00 / sw1.ElapsedMilliseconds * 100.0, 1);
+            Console.WriteLine($"花費時間 WhenAll  : {sw3.ElapsedMilliseconds} ms, 提升: {percent2} %");
         }
     }
 }

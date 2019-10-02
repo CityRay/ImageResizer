@@ -38,6 +38,72 @@ namespace ImageResizer
         /// <param name="sourcePath">圖片來源目錄路徑</param>
         /// <param name="destPath">產生圖片目的目錄路徑</param>
         /// <param name="scale">縮放比例</param>
+        public void ResizeImages(string sourcePath, string destPath, double scale)
+        {
+            var allFiles = FindImages(sourcePath);
+
+            foreach (var filePath in allFiles)
+            {
+                var imgPhoto = Image.FromFile(filePath);
+                var imgName = Path.GetFileNameWithoutExtension(filePath);
+
+                var sourceWidth = imgPhoto.Width;
+                var sourceHeight = imgPhoto.Height;
+
+                var destionatonWidth = (int)(sourceWidth * scale);
+                var destionatonHeight = (int)(sourceHeight * scale);
+
+                Bitmap processedImage = processBitmap((Bitmap)imgPhoto,
+                        sourceWidth, sourceHeight,
+                        destionatonWidth, destionatonHeight);
+
+                processedImage.Save(Path.Combine(destPath, imgName + ".jpg"), ImageFormat.Jpeg);
+                processedImage.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// 進行圖片的縮放作業 WaitAll
+        /// </summary>
+        /// <param name="sourcePath">圖片來源目錄路徑</param>
+        /// <param name="destPath">產生圖片目的目錄路徑</param>
+        /// <param name="scale">縮放比例</param>
+        public void ResizeImagesWait(string sourcePath, string destPath, double scale)
+        {
+            var allFiles = FindImages(sourcePath);
+
+            List<Task> tasks = new List<Task>();
+
+            foreach (var filePath in allFiles)
+            {
+                tasks.Add(Task.Run(() => {
+                    var imgPhoto = Image.FromFile(filePath);
+                    var imgName = Path.GetFileNameWithoutExtension(filePath);
+
+                    var sourceWidth = imgPhoto.Width;
+                    var sourceHeight = imgPhoto.Height;
+
+                    var destionatonWidth = (int)(sourceWidth * scale);
+                    var destionatonHeight = (int)(sourceHeight * scale);
+
+                    Bitmap processedImage = processBitmap((Bitmap)imgPhoto,
+                            sourceWidth, sourceHeight,
+                            destionatonWidth, destionatonHeight);
+
+                    processedImage.Save(Path.Combine(destPath, imgName + ".jpg"), ImageFormat.Jpeg);
+                    processedImage.Dispose();
+                }));
+            }
+
+            Task.WaitAll(tasks.ToArray());
+        }
+
+        /// <summary>
+        /// 進行圖片的縮放作業 Async
+        /// </summary>
+        /// <param name="sourcePath">圖片來源目錄路徑</param>
+        /// <param name="destPath">產生圖片目的目錄路徑</param>
+        /// <param name="scale">縮放比例</param>
         public async Task ResizeImagesAsync(string sourcePath, string destPath, double scale)
         {
             var allFiles = FindImages(sourcePath);
@@ -47,8 +113,8 @@ namespace ImageResizer
             foreach (var filePath in allFiles)
             {
                 tasks.Add(Task.Run(() => {
-                    var tid = String.Format("{0:D2}", Thread.CurrentThread.ManagedThreadId);
-                    Console.WriteLine($"(TID: {tid}) >>>> {DateTime.Now}");
+                    //var tid = String.Format("{0:D2}", Thread.CurrentThread.ManagedThreadId);
+                    //Console.WriteLine($"(TID: {tid}) >>>> {DateTime.Now}");
 
                     Image imgPhoto = Image.FromFile(filePath);
                     string imgName = Path.GetFileNameWithoutExtension(filePath);
