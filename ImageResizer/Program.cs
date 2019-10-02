@@ -24,6 +24,9 @@ namespace ImageResizer
             sw.Stop();
 
             Console.WriteLine($"花費時間: {sw.ElapsedMilliseconds} ms");
+
+            // 原始花費時間: 3354 ms
+            // WaitAll   : 2642 ms
         }
     }
 }
