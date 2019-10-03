@@ -23,10 +23,14 @@ namespace ImageResizer
             imageProcess.ResizeImages(sourcePath, destinationPath, 2.0);
             sw1.Stop();
 
+            imageProcess.Clean(destinationPath);
+
             Stopwatch sw2 = new Stopwatch();
             sw2.Start();
             imageProcess.ResizeImagesWait(sourcePath, destinationPath, 2.0);
             sw2.Stop();
+
+            imageProcess.Clean(destinationPath);
 
             Stopwatch sw3 = new Stopwatch();
             sw3.Start();
